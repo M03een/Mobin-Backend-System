@@ -33,21 +33,21 @@ class AuthController extends Controller
     public function login(Request $request) {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'password'
+            'password' => 'required|string'
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
-            ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json([
+                "message" => "The provided credentials are incorrect"
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            "user" => $user,
             "token" => $token
         ]);
     }
