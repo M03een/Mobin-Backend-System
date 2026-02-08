@@ -16,7 +16,7 @@ class Point extends Model
     protected $increamenting = false;
 
     protected $fillable = [
-        'title',
+        'amount',
         'type'
     ];
 
