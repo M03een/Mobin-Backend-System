@@ -17,7 +17,8 @@ class Point extends Model
 
     protected $fillable = [
         'amount',
-        'type'
+        'type',
+        'user_id'
     ];
 
     public function user() {
