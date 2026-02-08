@@ -21,8 +21,7 @@ class User extends Authenticatable
     protected $fillable = [
         'username',
         'email',
-        'password',
-        'points'
+        'password'
     ];
 
     /**
@@ -46,5 +45,9 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function points() {
+        $this->hasMany(Point::class);
     }
 }
