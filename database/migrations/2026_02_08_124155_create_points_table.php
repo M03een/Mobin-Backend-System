@@ -18,7 +18,7 @@ return new class extends Migration
                 'zikr',
                 'tasbeh'
             ]);
-            $table->timestamp('created_at');
+            $table->timestamps();
 
             $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
