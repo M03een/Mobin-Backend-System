@@ -6,15 +6,14 @@ use App\Models\Point;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PointController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function learderboard()
     {
-        // TODO The rank system to implemented
+        $leaderboard = DB::table('users')->orderBy('points', 'desc')->limit(10)->get(['id','username', 'points']);
+        return response()->json($leaderboard);
     }
 
     /**
