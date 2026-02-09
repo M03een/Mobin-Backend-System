@@ -1,24 +1,18 @@
 <?php
 
-namespace App\Http\v1\Controllers;
+namespace App\Http\Controllers\v1;
 
+use App\Http\Controllers\Controller;
 use App\Models\Point;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use function Illuminate\Support\now;
 
 class PointController extends Controller
 {
-    public function learderboard()
-    {
-        $leaderboard = DB::table('users')->orderBy('points', 'desc')->limit(10)->get(['id','username', 'points']);
-        return response()->json($leaderboard);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         if ($request->type == "zikr") {
@@ -30,6 +24,8 @@ class PointController extends Controller
             ]);
 
             $user->increment('points', $request->amount);
+            $user->last_point_at = Carbon::now();
+            $user->save();
 
             return response()->json([
                 'message' => $request->amount . " points add to user id " . Auth::id()
