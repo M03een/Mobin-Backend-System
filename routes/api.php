@@ -11,6 +11,8 @@ Route::middleware(ForceJsonResponse::class)->group(function (){
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/points', [PointController::class, 'learderboard']);
+    Route::post('password/forget', [AuthController::class, 'forgetPassword']);
+    Route::post('password/reset', [AuthController::class, 'resetPassword']);
     
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class,'me']);
