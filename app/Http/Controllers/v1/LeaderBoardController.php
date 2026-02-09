@@ -5,43 +5,73 @@ namespace App\Http\Controllers\v1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use function Illuminate\Support\now;
+use Carbon\Carbon;
 
 class LeaderBoardController extends Controller
 {
-    public function learderboard(Request $request)
+    // كل الوقت
+    public function all()
     {
-        $leaderboard = DB::table('users')->orderBy('points', 'desc')->limit(10)->get(['id','username', 'points']);
-        return response()->json($leaderboard);
-    }
-
-    public function month() {
-        $leaderboard = DB::table('users')->whereYear('last_point_at', now()->year)
-        ->whereMonth('last_point_at', now()->month)
-        ->orderBy('points', 'desc')
-        ->limit(10)
-        ->get(['id', 'username', 'points']);
+        $leaderboard = DB::table('user_points_total')
+            ->join('users', 'users.id', '=', 'user_points_total.user_id')
+            ->orderByDesc('points')
+            ->limit(10)
+            ->get(['users.id', 'users.username', 'user_points_total.points']);
 
         return response()->json($leaderboard);
     }
 
-    public function week() {
-        $leaderboard = DB::table('users')->whereBetween('last_point_at', [
-            now()->startOfWeek(),
-            now()->endOfWeek()
-        ])
-        ->orderBy('points', 'desc')
-        ->limit(10)
-        ->get(['id', 'username', 'points']);
+    // اليوم
+    public function day()
+    {
+        $today = Carbon::today()->toDateString();
+
+        $leaderboard = DB::table('user_points_daily')
+            ->join('users', 'users.id', '=', 'user_points_daily.user_id')
+            ->where('date', $today)
+            ->orderByDesc('points')
+            ->limit(10)
+            ->get(['users.id', 'users.username', 'user_points_daily.points']);
 
         return response()->json($leaderboard);
     }
 
-    public function day() {
-        $leaderboard = DB::table('users')->whereDate('last_point_at', today())
-        ->orderBy('points', 'desc')
-        ->limit(10)
-        ->get(['id', 'username', 'points']);
+    // الأسبوع
+    public function week()
+    {
+        $startOfWeek = Carbon::now()->startOfWeek()->toDateString();
+        $endOfWeek = Carbon::now()->endOfWeek()->toDateString();
+
+        $leaderboard = DB::table('points')
+            ->select('user_id', DB::raw('SUM(amount) as points'))
+            ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
+            ->groupBy('user_id')
+            ->orderByDesc('points')
+            ->limit(10)
+            ->get()
+            ->map(function($item) {
+                $user = DB::table('users')->find($item->user_id);
+                return [
+                    'id' => $user->id,
+                    'username' => $user->username,
+                    'points' => $item->points
+                ];
+            });
+
+        return response()->json($leaderboard);
+    }
+
+    // الشهر
+    public function month()
+    {
+        $month = Carbon::now()->format('Y-m');
+
+        $leaderboard = DB::table('user_points_monthly')
+            ->join('users', 'users.id', '=', 'user_points_monthly.user_id')
+            ->where('month', $month)
+            ->orderByDesc('points')
+            ->limit(10)
+            ->get(['users.id', 'users.username', 'user_points_monthly.points']);
 
         return response()->json($leaderboard);
     }
