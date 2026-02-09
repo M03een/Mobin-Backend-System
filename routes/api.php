@@ -11,7 +11,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(ForceJsonResponse::class)->group(function (){
         Route::post('/register', [AuthController::class, 'register']);
         Route::post('/login', [AuthController::class, 'login']);
-        Route::get('/points/all', [LeaderBoardController::class, 'learderboard']);
+        Route::get('/points/all', [LeaderBoardController::class, 'all']);
         Route::get('/points/month', [LeaderBoardController::class, 'month']);
         Route::get('/points/week', [LeaderBoardController::class, 'week']);
         Route::get('/points/day', [LeaderBoardController::class, 'day']);
