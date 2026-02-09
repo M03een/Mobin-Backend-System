@@ -9,47 +9,77 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use function Illuminate\Support\now;
 
 class PointController extends Controller
 {
     public function store(Request $request)
     {
-        if ($request->type == "zikr") {
-            $user = User::find(Auth::id());
+        $request->validate([
+            'type' => 'required|in:zikr,tasbeh',
+            'amount' => 'required|integer|min:1'
+        ]);
+
+        $userId = Auth::id();
+        $amount = $request->amount;
+        $type = $request->type;
+
+        DB::transaction(function () use ($userId, $amount, $type) {
+
             Point::create([
-                "user_id" => Auth::id(),
-                'type' => $request->type,
-                'amount' => $request->amount
+                "user_id" => $userId,
+                'type' => $type,
+                'amount' => $amount,
+                'created_at' => now(),
             ]);
 
-            $user->increment('points', $request->amount);
-            $user->last_point_at = Carbon::now();
-            $user->save();
+            DB::table('user_points_total')->updateOrInsert(
+                ['user_id' => $userId],
+                [
+                    'points' => DB::raw("COALESCE(points, 0) + $amount"),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+            
 
-            return response()->json([
-                'message' => $request->amount . " points add to user id " . Auth::id()
-            ], 201);
-        }
+            DB::table('user_points_daily')->updateOrInsert(
+                ['user_id' => $userId, 'date' => now()->toDateString()],
+                ['points' => DB::raw("points + $amount")]
+            );
 
-        if ($request->type == "tasbeh") {
-            $user = User::find(Auth::id());
-            Point::create([
-                "user_id" => Auth::id(),
-                'type' => $request->type,
-                'amount' => $request->amount
-            ]);
+            DB::table('user_points_monthly')->updateOrInsert(
+                ['user_id' => $userId, 'month' => now()->format('Y-m')],
+                ['points' => DB::raw("points + $amount")]
+            );
 
-            $user->increment('points', $request->amount);
+            $weekKey = now()->year . '-' . now()->weekOfYear;
 
-            return response()->json([
-                'message' => $request->amount . " points add to user id " . Auth::id()
-            ], 201);
-        }
+            $weekly = DB::table('user_points_weekly')
+                ->where('user_id', $userId)
+                ->where('week', $weekKey);
+
+            if ($weekly->exists()) {
+                $weekly->increment('points', $amount);
+            } else {
+                DB::table('user_points_weekly')->insert([
+                    'user_id' => $userId,
+                    'week' => $weekKey,
+                    'points' => $amount,
+                ]);
+            }
+
+            $user = User::find($userId);
+            $user->increment('points', $amount);
+
+            if ($type == "zikr") {
+                $user->last_point_at = now();
+                $user->save();
+            }
+        });
 
         return response()->json([
-            "message" => "Unknown type was provided"
-        ], 400);
+            'message' => "$amount points added to user id $userId"
+        ], 201);
     }
 
     /**
@@ -57,6 +87,31 @@ class PointController extends Controller
      */
     public function show(string $id)
     {
-        // TODO Get the user's points
+        // $user = User::findOrFail($id);
+
+        // نقاط المستخدم حسب الفترة
+        // $daily = DB::table('user_points_daily')
+        //     ->where('user_id', $id)
+        //     ->where('date', now()->toDateString())
+        //     ->value('points') ?? 0;
+
+        // $monthly = DB::table('user_points_monthly')
+        //     ->where('user_id', $id)
+        //     ->where('month', now()->format('Y-m'))
+        //     ->value('points') ?? 0;
+
+        // $total = DB::table('user_points_total')
+        //     ->where('user_id', $id)
+        //     ->value('points') ?? 0;
+
+        // return response()->json([
+        //     'user_id' => $id,
+        //     'username' => $user->username,
+        //     'points' => [
+        //         'daily' => $daily,
+        //         'monthly' => $monthly,
+        //         'total' => $total,
+        //     ]
+        // ]);
     }
 }
