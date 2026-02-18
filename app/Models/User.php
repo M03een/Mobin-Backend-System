@@ -53,7 +53,7 @@ class User extends Authenticatable
     }
 
     public function points() {
-        $this->hasMany(Point::class);
+        return $this->hasMany(Point::class);
     }
 
     public function updateStreak()
