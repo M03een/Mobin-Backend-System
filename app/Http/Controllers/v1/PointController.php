@@ -101,10 +101,9 @@ class PointController extends Controller
                 $user->increment('points', 25);
                 $user->last_point_at = now();
                 $user->save();
+                $user->updateStreak();
             });
 
-            $user = auth()->user();
-            $user->updateStreak();
             return response()->json([
                 'message' => "25 points added to user id $userId"
             ], 201);
@@ -188,10 +187,9 @@ class PointController extends Controller
                 $user->increment('points', 5);
                 $user->last_point_at = now();
                 $user->save();
+                $user->updateStreak();
             });
 
-            $user = auth()->user();
-            $user->updateStreak();
             return response()->json([
                 'message' => "5 points added to user id $userId"
             ], 201);
