@@ -3,10 +3,12 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -46,10 +48,32 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            "last_streak_date" => "date"
         ];
     }
 
     public function points() {
         $this->hasMany(Point::class);
     }
+
+    public function updateStreak()
+    {
+        $today = Carbon::today();
+        $yesterday = Carbon::yesterday();
+
+        if ($this->last_streak_date?->equalTo($today)) {
+            return;
+        }
+
+        if ($this->last_streak_date?->equalTo($yesterday)) {
+            $this->streak_count += 1;
+        }else {
+            $this->streak_count = 1;
+        }
+
+        $this->last_streak_date = $today;
+        $this->save();
+    }
+
+    // TODO Reset streack functionality
 }
