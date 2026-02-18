@@ -16,10 +16,10 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasUuids, HasApiTokens;
 
-    protected $tableName = "users";
+    protected $table = "users";
 
     protected $type = 'string';
-    protected $increamenting = false;
+    protected $incrementing = false;
 
     protected $fillable = [
         'username',
