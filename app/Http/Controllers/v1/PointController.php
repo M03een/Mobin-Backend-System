@@ -201,37 +201,4 @@ class PointController extends Controller
             ], 400);
         }
     }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        // $user = User::findOrFail($id);
-
-        // نقاط المستخدم حسب الفترة
-        // $daily = DB::table('user_points_daily')
-        //     ->where('user_id', $id)
-        //     ->where('date', now()->toDateString())
-        //     ->value('points') ?? 0;
-
-        // $monthly = DB::table('user_points_monthly')
-        //     ->where('user_id', $id)
-        //     ->where('month', now()->format('Y-m'))
-        //     ->value('points') ?? 0;
-
-        // $total = DB::table('user_points_total')
-        //     ->where('user_id', $id)
-        //     ->value('points') ?? 0;
-
-        // return response()->json([
-        //     'user_id' => $id,
-        //     'username' => $user->username,
-        //     'points' => [
-        //         'daily' => $daily,
-        //         'monthly' => $monthly,
-        //         'total' => $total,
-        //     ]
-        // ]);
-    }
 }
