@@ -35,8 +35,12 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'last_point_at'
+        'last_point_at',
+        'last_streak_date',
+        'streak_count'
     ];
+
+    protected $appends = ['current_streak'];
 
     /**
      * Get the attributes that should be cast.
@@ -75,5 +79,18 @@ class User extends Authenticatable
         $this->save();
     }
 
-    // TODO Reset streack functionality
+    protected function currentStreak(): Attribute
+    {
+        return Attribute::make(
+            get: function () {
+                $today = Carbon::today();
+                $yesterday = Carbon::yesterday();
+
+                if ($this->last_streak_date?->equalTo($today) || $this->last_streak_date?->equalTo($yesterday)) {
+                    return $this->streak_count;
+                }
+                return 0;
+            }
+        );
+    }
 }
