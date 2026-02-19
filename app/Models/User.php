@@ -35,7 +35,9 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-        'last_point_at'
+        'last_point_at',
+        'last_streak_date',
+        'streak_count'
     ];
 
     protected $appends = ['current_streak'];
