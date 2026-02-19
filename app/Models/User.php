@@ -19,7 +19,7 @@ class User extends Authenticatable
     protected $table = "users";
 
     protected $type = 'string';
-    protected $incrementing = false;
+    public $incrementing = false;
 
     protected $fillable = [
         'username',
@@ -56,7 +56,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function points() {
+    public function pointsHistory() {
         return $this->hasMany(Point::class);
     }
 
