@@ -1,59 +1,160 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mobin Backend System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Mobin is a full-stack application for tracking spiritual practice activity, awarding points, and surfacing competitive leaderboards. The repository contains a **Laravel 12 REST API** and a **Vue 3 single-page client** that work together as a versioned JSON API (`/api/v1`).
 
-## About Laravel
+## Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Users register and authenticate with token-based sessions (Laravel Sanctum). Authenticated users can log **zikr** and **tasbeh** activities to earn points and build daily streaks. Public leaderboard endpoints rank the top performers across multiple time windows without requiring authentication.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Layer | Technology |
+| --- | --- |
+| API | PHP 8.2+, Laravel 12, Sanctum |
+| Database | MariaDB (MySQL-compatible) |
+| Frontend | Vue 3, Vite, Pinia, Vue Router |
+| Testing | Pest |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Features
 
-## Learning Laravel
+### Authentication
+- Register, login, and logout with API tokens
+- Current user profile (`/me`)
+- Password reset via email OTP
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Points & streaks
+- Record activity types: `zikr` and `tasbeh`
+- Points roll up into daily, weekly, monthly, and all-time aggregates
+- Streak tracking based on consecutive days of earning points
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### Leaderboards
+Public top-10 rankings by period:
+- All time
+- Today
+- This week
+- This month
 
-## Laravel Sponsors
+### Web client (`frontend/`)
+- Home page with tabbed leaderboards
+- Registration, login, forgot/reset password flows
+- Authenticated dashboard for earning points
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+## Repository structure
 
-### Premium Partners
+```
+Mobin-Backend-System/
+├── app/                    # Laravel application code
+│   ├── Http/Controllers/v1/
+│   ├── Http/Requests/
+│   ├── Http/Middleware/
+│   └── Models/
+├── database/migrations/    # Schema and aggregate tables
+├── routes/api.php          # Versioned API routes
+├── frontend/               # Vue SPA (separate Vite app)
+│   ├── src/
+│   └── package.json
+├── tests/                  # Pest feature and unit tests
+└── composer.json
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+## API reference
 
-## Contributing
+All routes are prefixed with `/api/v1` and return JSON (`ForceJsonResponse` middleware).
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+| Method | Endpoint | Auth | Description |
+| --- | --- | --- | --- |
+| `POST` | `/register` | — | Create account; returns user + token |
+| `POST` | `/login` | — | Sign in; returns user + token |
+| `POST` | `/logout` | Bearer | Revoke current token |
+| `GET` | `/me` | Bearer | Authenticated user profile |
+| `POST` | `/password/forget` | — | Send password-reset OTP |
+| `POST` | `/password/reset` | — | Reset password with OTP |
+| `POST` | `/points` | Bearer | Log `zikr` or `tasbeh` activity |
+| `GET` | `/points/all` | — | All-time leaderboard |
+| `GET` | `/points/day` | — | Today's leaderboard |
+| `GET` | `/points/week` | — | This week's leaderboard |
+| `GET` | `/points/month` | — | This month's leaderboard |
 
-## Code of Conduct
+Authenticated requests use the `Authorization: Bearer <token>` header.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Prerequisites
 
-## Security Vulnerabilities
+- PHP 8.2 or newer with common extensions (`mbstring`, `pdo`, etc.)
+- [Composer](https://getcomposer.org/)
+- Node.js 18+ and npm
+- MariaDB or MySQL
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Getting started
+
+### 1. Backend
+
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+```
+
+Configure database credentials in `.env` (default database name: `mobin_backend_system`):
+
+```env
+DB_CONNECTION=mariadb
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=mobin_backend_system
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Run migrations and start the API:
+
+```bash
+php artisan migrate
+php artisan serve
+```
+
+The API is available at `http://127.0.0.1:8000`.
+
+**One-command setup** (install, env, key, migrate, and build root assets):
+
+```bash
+composer setup
+```
+
+**Development** (API server, queue worker, and root Vite in parallel):
+
+```bash
+composer dev
+```
+
+### 2. Frontend
+
+```bash
+cd frontend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+In development, the Vite dev server proxies API calls to the Laravel backend. For production, set `VITE_API_BASE_URL` to your deployed API base (e.g. `https://your-domain.com/api/v1`).
+
+```bash
+npm run build
+```
+
+### 3. Mail (password reset)
+
+Password reset sends OTP codes via Laravel Mail. Configure your mail driver in `.env`. For local development, `MAIL_MAILER=log` writes messages to `storage/logs/laravel.log`.
+
+## Running tests
+
+```bash
+composer test
+# or
+php artisan test
+```
+
+## Health check
+
+Laravel exposes a health endpoint at `/up` for uptime monitoring.
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is open-source software licensed under the [MIT license](https://opensource.org/licenses/MIT).
