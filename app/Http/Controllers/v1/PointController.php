@@ -44,7 +44,7 @@ class PointController extends Controller
                     ],
                     ['user_id'],
                     [
-                        'points' => DB::raw('points + ' . $amount),
+                        'points' => DB::raw('points + ' . (int) $amount),
                         'updated_at' => now(),
                     ]
                 );   
@@ -61,7 +61,7 @@ class PointController extends Controller
                     ],
                     ['user_id', 'date'],
                     [
-                        'points' => DB::raw('points + ' . $amount),
+                        'points' => DB::raw('points + ' . (int) $amount),
                         'date' => now()->toDateString(),
                     ]
                 );                                     
@@ -78,7 +78,7 @@ class PointController extends Controller
                     ['user_id'],
                     [
                         'month' => now()->format('Y-m'),
-                        'points' => DB::raw('points + ' . $amount)
+                        'points' => DB::raw('points + ' . (int) $amount)
                     ]
                     );
                 
@@ -130,7 +130,7 @@ class PointController extends Controller
                     ],
                     ['user_id'],
                     [
-                        'points' => DB::raw('points + ' . $amount),
+                        'points' => DB::raw('points + ' . (int) $amount),
                         'updated_at' => now(),
                     ]
                 );   
@@ -147,7 +147,7 @@ class PointController extends Controller
                     ],
                     ['user_id', 'date'],
                     [
-                        'points' => DB::raw('points + ' . $amount),
+                        'points' => DB::raw('points + ' . (int) $amount),
                         'date' => now()->toDateString(),
                     ]
                 );                                     
@@ -164,7 +164,7 @@ class PointController extends Controller
                     ['user_id'],
                     [
                         'month' => now()->format('Y-m'),
-                        'points' => DB::raw('points + ' . $amount)
+                        'points' => DB::raw('points + ' . (int) $amount)
                     ]
                     );
                 

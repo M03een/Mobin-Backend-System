@@ -21,7 +21,7 @@ Route::prefix('v1')->group(function () {
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('/me', [AuthController::class,'me']);
             Route::post('/logout', [AuthController::class,'logout']);
-            Route::post('/points', [PointController::class, 'store']);
+            Route::post('/points', [PointController::class, 'store'])->middleware('throttle:30,1');
         });
     });
 });
