@@ -16,10 +16,12 @@ class PointController extends Controller
     {
         $request->validate([
             'type' => 'required|in:zikr,tasbeh',
+            'amount' => 'required|integer|max:100|min:1'
         ]);
 
         $userId = Auth::id();
         $type = $request->type;
+        $amount = $request->amount;
 
         if ($request->type == "zikr") {
             DB::transaction(function () use ($userId, $type) {
@@ -27,7 +29,7 @@ class PointController extends Controller
                 Point::create([
                     "user_id" => $userId,
                     'type' => $type,
-                    'amount' => 25,
+                    'amount' => $amount,
                     'created_at' => now(),
                 ]);
     
@@ -37,12 +39,12 @@ class PointController extends Controller
                             'user_id' => $userId,
                             'created_at' => now(),
                             'updated_at' => now(),
-                            'points' => 25,
+                            'points' => $amount,
                         ]
                     ],
                     ['user_id'],
                     [
-                        'points' => DB::raw('points + 25'),
+                        'points' => DB::raw('points + ' . $amount),
                         'updated_at' => now(),
                     ]
                 );   
@@ -54,12 +56,12 @@ class PointController extends Controller
                         [
                             'user_id' => $userId,
                             'date' => now()->toDateString(),
-                            'points' => 25,
+                            'points' => $amount,
                         ]
                     ],
                     ['user_id', 'date'],
                     [
-                        'points' => DB::raw('points + 25'),
+                        'points' => DB::raw('points + ' . $amount),
                         'date' => now()->toDateString(),
                     ]
                 );                                     
@@ -70,13 +72,13 @@ class PointController extends Controller
                         [
                             'user_id' => $userId,
                             'month' => now()->format('Y-m'),
-                            'points' => 25
+                            'points' => $amount
                         ]
                     ],
                     ['user_id'],
                     [
                         'month' => now()->format('Y-m'),
-                        'points' => DB::raw('points + 25')
+                        'points' => DB::raw('points + ' . $amount)
                     ]
                     );
                 
@@ -88,24 +90,24 @@ class PointController extends Controller
                     ->where('week', $weekKey);
     
                 if ($weekly->exists()) {
-                    $weekly->increment('points', 25);
+                    $weekly->increment('points', $amount);
                 } else {
                     DB::table('user_points_weekly')->insert([
                         'user_id' => $userId,
                         'week' => $weekKey,
-                        'points' => 25,
+                        'points' => $amount,
                     ]);
                 }
     
                 $user = User::find($userId);
-                $user->increment('points', 25);
+                $user->increment('points', $amount);
                 $user->last_point_at = now();
                 $user->save();
                 $user->updateStreak();
             });
 
             return response()->json([
-                'message' => "25 points added to user id $userId"
+                'message' => $amount . " points added to user id $userId"
             ], 201);
         } elseif ($request->type == "tasbeh") {
             DB::transaction(function () use ($userId, $type) {
@@ -113,7 +115,7 @@ class PointController extends Controller
                 Point::create([
                     "user_id" => $userId,
                     'type' => $type,
-                    'amount' => 25,
+                    'amount' => $amount,
                     'created_at' => now(),
                 ]);
     
@@ -123,12 +125,12 @@ class PointController extends Controller
                             'user_id' => $userId,
                             'created_at' => now(),
                             'updated_at' => now(),
-                            'points' => 25,
+                            'points' => $amount,
                         ]
                     ],
                     ['user_id'],
                     [
-                        'points' => DB::raw('points + 25'),
+                        'points' => DB::raw('points + ' . $amount),
                         'updated_at' => now(),
                     ]
                 );   
@@ -140,12 +142,12 @@ class PointController extends Controller
                         [
                             'user_id' => $userId,
                             'date' => now()->toDateString(),
-                            'points' => 5,
+                            'points' => $amount,
                         ]
                     ],
                     ['user_id', 'date'],
                     [
-                        'points' => DB::raw('points + 5'),
+                        'points' => DB::raw('points + ' . $amount),
                         'date' => now()->toDateString(),
                     ]
                 );                                     
@@ -156,13 +158,13 @@ class PointController extends Controller
                         [
                             'user_id' => $userId,
                             'month' => now()->format('Y-m'),
-                            'points' => 5
+                            'points' => $amount
                         ]
                     ],
                     ['user_id'],
                     [
                         'month' => now()->format('Y-m'),
-                        'points' => DB::raw('points + 5')
+                        'points' => DB::raw('points + ' . $amount)
                     ]
                     );
                 
@@ -174,24 +176,24 @@ class PointController extends Controller
                     ->where('week', $weekKey);
     
                 if ($weekly->exists()) {
-                    $weekly->increment('points', 5);
+                    $weekly->increment('points', $amount);
                 } else {
                     DB::table('user_points_weekly')->insert([
                         'user_id' => $userId,
                         'week' => $weekKey,
-                        'points' => 5,
+                        'points' => $amount,
                     ]);
                 }
     
                 $user = User::find($userId);
-                $user->increment('points', 5);
+                $user->increment('points', $amount);
                 $user->last_point_at = now();
                 $user->save();
                 $user->updateStreak();
             });
 
             return response()->json([
-                'message' => "5 points added to user id $userId"
+                'message' => $amount . " points added to user id $userId"
             ], 201);
         } else {
             return response()->json([
