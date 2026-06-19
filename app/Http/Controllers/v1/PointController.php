@@ -24,7 +24,7 @@ class PointController extends Controller
         $amount = $request->amount;
 
         if ($request->type == "zikr") {
-            DB::transaction(function () use ($userId, $type) {
+            DB::transaction(function () use ($userId, $type, $amount) {
 
                 Point::create([
                     "user_id" => $userId,
@@ -75,12 +75,12 @@ class PointController extends Controller
                             'points' => $amount
                         ]
                     ],
-                    ['user_id'],
+                    ['user_id', 'month'],
                     [
                         'month' => now()->format('Y-m'),
                         'points' => DB::raw('points + ' . (int) $amount)
                     ]
-                    );
+                );
                 
     
                 $weekKey = now()->year . '-' . now()->weekOfYear;
@@ -110,7 +110,7 @@ class PointController extends Controller
                 'message' => $amount . " points added to user id $userId"
             ], 201);
         } elseif ($request->type == "tasbeh") {
-            DB::transaction(function () use ($userId, $type) {
+            DB::transaction(function () use ($userId, $type, $amount) {
 
                 Point::create([
                     "user_id" => $userId,
@@ -161,7 +161,7 @@ class PointController extends Controller
                             'points' => $amount
                         ]
                     ],
-                    ['user_id'],
+                    ['user_id', 'month'],
                     [
                         'month' => now()->format('Y-m'),
                         'points' => DB::raw('points + ' . (int) $amount)
