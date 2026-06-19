@@ -9,7 +9,6 @@ use Carbon\Carbon;
 
 class LeaderBoardController extends Controller
 {
-    // كل الوقت
     public function all()
     {
         $leaderboard = DB::table('user_points_total')
@@ -21,7 +20,6 @@ class LeaderBoardController extends Controller
         return response()->json($leaderboard);
     }
 
-    // اليوم
     public function day()
     {
         $today = Carbon::today()->toDateString();
@@ -36,7 +34,6 @@ class LeaderBoardController extends Controller
         return response()->json($leaderboard);
     }
 
-    // الأسبوع
     public function week()
     {
         $startOfWeek = Carbon::now()->startOfWeek()->toDateString();
@@ -61,7 +58,6 @@ class LeaderBoardController extends Controller
         return response()->json($leaderboard);
     }
 
-    // الشهر
     public function month()
     {
         $month = Carbon::now()->format('Y-m');
