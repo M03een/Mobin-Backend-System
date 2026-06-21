@@ -18,7 +18,7 @@ class ForgetPasswordRequest extends FormRequest
         return [
             'email.required' => 'email must be given',
             'email.email' => 'invalid email format',
-            'email.exists' => 'this email not in our records'
+            'email.exists' => 'if this email exists, a reset link was sent'
         ];
     }
 }
