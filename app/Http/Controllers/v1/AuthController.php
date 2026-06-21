@@ -86,7 +86,7 @@ class AuthController extends Controller
         ->first();
 
         if (!$record || !Hash::check($request->otp, $record->otp)) {
-            return response()->json(['message' => 'invalid OTP', 400]);
+            return response()->json(['message' => 'invalid OTP'], 400);
         }
 
         $user = User::where('email', $request->email)->first();
