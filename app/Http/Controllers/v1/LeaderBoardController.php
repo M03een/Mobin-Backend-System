@@ -4,6 +4,7 @@ namespace App\Http\Controllers\v1;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -11,11 +12,13 @@ class LeaderBoardController extends Controller
 {
     public function all()
     {
-        $leaderboard = DB::table('user_points_total')
-            ->join('users', 'users.id', '=', 'user_points_total.user_id')
-            ->orderByDesc('points')
-            ->limit(10)
-            ->get(['users.id', 'users.username', 'user_points_total.points']);
+        $leaderboard = Cache::remember('leaderboard:total', now()->addMinutes(5), function () {
+            return DB::table('user_points_total')
+                ->join('users', 'users.id', '=', 'user_points_total.user_id')
+                ->orderByDesc('points')
+                ->limit(10)
+                ->get(['users.id', 'users.username', 'user_points_total.points']);
+        });
 
         return response()->json($leaderboard);
     }

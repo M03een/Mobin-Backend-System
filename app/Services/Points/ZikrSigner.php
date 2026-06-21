@@ -2,6 +2,7 @@
 
 namespace App\Services\Points;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use App\Models\Point;
 use App\Models\User;
@@ -88,6 +89,17 @@ class ZikrSigner implements PointSignerInterface {
             $user->last_point_at = now();
             $user->save();
             $user->updateStreak();
+
+            DB::afterCommit(function () use ($userId) {
+                $today = now()->toDateString();
+                $week = now()->year . '-' . now()->weekOfYear();
+                $month = now()->format('Y-m');
+
+                Cache::forget('user:{$userId}:points:total');
+                Cache::forget('user:{$userId}:points:daily:{$today}');
+                Cache::forget('user:{userId}:points:weekly:{$week}');
+                Cache::forget('user:{userId}:points:monthly:{$month}');
+            });
         });
     }
 }
