@@ -11,9 +11,9 @@ class Point extends Model
 {
     use HasFactory, Notifiable, HasUuids;
 
-    protected $tableName = "points";
+    protected $table = "points";
     protected $type = "string";
-    protected $increamenting = false;
+    protected $incrementing = false;
 
     protected $fillable = [
         'amount',
