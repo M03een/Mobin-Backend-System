@@ -18,7 +18,7 @@ class User extends Authenticatable
 
     protected $table = "users";
 
-    protected $type = 'string';
+    protected $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [

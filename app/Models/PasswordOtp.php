@@ -9,8 +9,8 @@ class PasswordOtp extends Model
 {
     use HasUuids;
     protected $table = "password_otps";
-    protected $type = "string";
-    protected $incrementing = false;
+    protected $keyType = "string";
+    public $incrementing = false;
 
     protected $fillable = [
         "email",

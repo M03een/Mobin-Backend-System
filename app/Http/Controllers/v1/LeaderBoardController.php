@@ -15,7 +15,7 @@ class LeaderBoardController extends Controller
         $leaderboard = Cache::remember('leaderboard:total', now()->addMinutes(5), function () {
             return DB::table('user_points_total')
                 ->join('users', 'users.id', '=', 'user_points_total.user_id')
-                ->orderByDesc('points')
+                ->orderByDesc('user_points_total.points')
                 ->limit(10)
                 ->get(['users.id', 'users.username', 'user_points_total.points']);
         });
@@ -30,7 +30,7 @@ class LeaderBoardController extends Controller
         $leaderboard = DB::table('user_points_daily')
             ->join('users', 'users.id', '=', 'user_points_daily.user_id')
             ->where('date', $today)
-            ->orderByDesc('points')
+            ->orderByDesc('user_points_daily.points')
             ->limit(10)
             ->get(['users.id', 'users.username', 'user_points_daily.points']);
 
@@ -68,7 +68,7 @@ class LeaderBoardController extends Controller
         $leaderboard = DB::table('user_points_monthly')
             ->join('users', 'users.id', '=', 'user_points_monthly.user_id')
             ->where('month', $month)
-            ->orderByDesc('points')
+            ->orderByDesc('user_points_monthly.points')
             ->limit(10)
             ->get(['users.id', 'users.username', 'user_points_monthly.points']);
 
